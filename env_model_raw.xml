@@ -116,7 +116,7 @@
       </body>
     </body>
     <camera euler="0 0 0" fovy="45" ipd="0.0" mode="fixed" name="rgbd_cage" pos="0.7 0.1 0.9" />
-      <body name="puck" pos="0.3 0 0.014">
+      <body name="puck" pos="[puck_pos]">
       <joint name="box:joint" damping="0.05" type="free" />
       <geom condim="1"
             density="1000"
@@ -125,7 +125,7 @@
             pos="0 0 0"
             priority="1"
             rgba="0.32 0.32 0.32 1"
-            size="0.5 0.5"
+            size="[puck_size]"
             solimp="0.998 0.998 0.001"
             solref="0.002 1"
             type="cylinder" />

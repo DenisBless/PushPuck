@@ -1,7 +1,8 @@
 from pathlib import Path
 import numpy as np
-from mujoco_py import MjSim, MjViewer, load_model_from_path, MjSimState
 import mujoco_py
+from mujoco_py import MjSim, MjViewer, load_model_from_path, MjSimState
+from utils.helpers import set_puck
 from mp_lib.mp_lib.dmps import DMP
 from mp_lib.mp_lib.phase import ExpDecayPhaseGenerator
 from mp_lib.mp_lib.basis import DMPBasisGenerator
@@ -12,6 +13,8 @@ class PushPuck:
                  nsubsteps=1,
                  render=True):
         xml_path = str(Path(__file__).resolve().parents[0]) + '/env_model.xml'
+
+        set_puck(puck_size=None, puck_pos=None)
         model = load_model_from_path(xml_path)
 
         self.sim = MjSim(model=model, nsubsteps=nsubsteps)
