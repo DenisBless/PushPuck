@@ -13,8 +13,7 @@ class PushPuck:
         self.sim = MjSim(model=model, nsubsteps=nsubsteps)
         self.viewer = MjViewer(self.sim) if render else None
 
-        self.robot_init_qpos = np.array([4.96976216e-05, - 1.84996010e-01, - 4.63546468e-05, - 2.08528506e+00,
-                                         -8.95942123e-06, 1.90028276e+00, 7.85404067e-01, 0., 0.])
+        self.robot_init_qpos = np.array([0, 0.202, 0, -2.86, 0, 1.98, 0.771, 0, 0])
 
         self.reset()
 
