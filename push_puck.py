@@ -23,9 +23,6 @@ class PushPuckBase(ABC):
         self.sim = MjSim(model=model, nsubsteps=nsubsteps)
         self.viewer = MjViewer(self.sim) if render else None
 
-        self.robot_init_qpos = np.array([0, 0.202, 0, -2.86, 0, 1.98, 0.771, 0, 0])
-        self.robot_final_qpos = np.array([0, 1.2, 0, -2.86, 0, 4.1, 0.771, 0, 0])
-
         self.joint_indices = [x for x in range(1, num_dof + 1)]
 
         self.reset()
@@ -51,9 +48,43 @@ class PushPuckBase(ABC):
     def raw_xml_path(self):
         raise NotImplementedError
 
+    @property
+    @abstractmethod
+    def robot_init_qpos(self):
+        raise NotImplementedError
+
+    @property
+    @abstractmethod
+    def robot_final_qpos(self):
+        raise NotImplementedError
+
     @abstractmethod
     def rollout(self, weights):
         raise NotImplementedError
+
+
+class PushPuck0(PushPuckBase):
+    def __init__(self,
+                 nsubsteps: int = 1,
+                 render: bool = True,
+                 num_dof: int = 7):
+        super().__init__(nsubsteps=nsubsteps, render=render, num_dof=num_dof)
+
+    @property
+    def robot_init_qpos(self):
+        return np.array([0, 0])
+
+    @property
+    def robot_final_qpos(self):
+        return np.array([0, 0])  # Todo
+
+    @property
+    def raw_xml_path(self):
+        return str(Path(__file__).resolve().parents[0]) + '/assets/xml_model/env_model_0_raw.xml'
+
+    def rollout(self, weights):
+        for i in range(10000):
+            self.viewer.render()
 
 
 class PushPuck2(PushPuckBase):
@@ -65,7 +96,15 @@ class PushPuck2(PushPuckBase):
 
     @property
     def raw_xml_path(self):
-        return str(Path(__file__).resolve().parents[0]) + '/assets/xml_model/env_model_raw.xml'
+        return str(Path(__file__).resolve().parents[0]) + '/assets/xml_model/env_model_2_raw.xml'
+
+    @property
+    def robot_init_qpos(self):
+        return np.array([0, 0.202, 0, -2.86, 0, 1.98, 0.771, 0, 0])
+
+    @property
+    def robot_final_qpos(self):
+        return np.array([0, 1.2, 0, -2.86, 0, 4.1, 0.771, 0, 0])
 
     def rollout(self, weights):
         weights = np.reshape(weights, (-1, 3))
@@ -199,7 +238,7 @@ class PushPuck2(PushPuckBase):
 
 
 if __name__ == '__main__':
-    pp = PushPuck2(nsubsteps=5, render=True)
+    pp = PushPuck0(nsubsteps=5, render=True)
     # Only make joint 2,4 and 6 controllable!
 
     w = 50 * np.random.randn(15)
