@@ -7,28 +7,26 @@ from utils.helpers import set_puck
 from mp_lib.dmps import DMP
 from mp_lib.phase import ExpDecayPhaseGenerator
 from mp_lib.basis import DMPBasisGenerator
+from abc import abstractmethod, ABC
 
 
-class PushPuck:
+class PushPuckBase(ABC):
     def __init__(self,
-                 nsubsteps=1,
-                 render=True):
-        xml_path = str(Path(__file__).resolve().parents[0]) + '/env_model.xml'
+                 nsubsteps: int = 1,
+                 render: bool = True,
+                 num_dof: int = 7):
+        self.render = render
 
-        set_puck(puck_size=None, puck_pos=None)
-        model = load_model_from_path(xml_path)
+        set_puck(raw_xml_path=self.raw_xml_path, xml_path=self.xml_path, puck_size=None, puck_pos=None)
+        model = load_model_from_path(self.xml_path)
 
         self.sim = MjSim(model=model, nsubsteps=nsubsteps)
         self.viewer = MjViewer(self.sim) if render else None
 
         self.robot_init_qpos = np.array([0, 0.202, 0, -2.86, 0, 1.98, 0.771, 0, 0])
-
         self.robot_final_qpos = np.array([0, 1.2, 0, -2.86, 0, 4.1, 0.771, 0, 0])
 
-        self.p_gains = np.array([20, 30, 100, 100, 10, 100, 2.5])
-        self.d_gains = np.array([7, 15, 5, 2.5, 0.3, 10, 0.05])
-        self.max_ctrl = np.array([15., 12., 40., 60., 5., 5., 2.])
-        self.min_ctrl = -self.max_ctrl
+        self.joint_indices = [x for x in range(1, num_dof + 1)]
 
         self.reset()
 
@@ -44,8 +42,32 @@ class PushPuck:
         self.sim.set_state(mjSimState)
         self.sim.forward()
 
-    def rollout(self, weights, render=False):
+    @property
+    def xml_path(self):
+        return str(Path(__file__).resolve().parents[0]) + '/' + 'assets/xml_model/env_model.xml'
 
+    @property
+    @abstractmethod
+    def raw_xml_path(self):
+        raise NotImplementedError
+
+    @abstractmethod
+    def rollout(self, weights):
+        raise NotImplementedError
+
+
+class PushPuck2(PushPuckBase):
+    def __init__(self,
+                 nsubsteps: int = 1,
+                 render: bool = True,
+                 num_dof: int = 7):
+        super().__init__(nsubsteps=nsubsteps, render=render, num_dof=num_dof)
+
+    @property
+    def raw_xml_path(self):
+        return str(Path(__file__).resolve().parents[0]) + '/assets/xml_model/env_model_raw.xml'
+
+    def rollout(self, weights):
         weights = np.reshape(weights, (-1, 3))
         n_steps = weights.shape[0]
 
@@ -83,11 +105,6 @@ class PushPuck:
             plt.plot(des_pos)
             plt.pause(0.1)
 
-        if render:
-            viewer = MjViewer(self.sim)
-        else:
-            viewer = None
-
         dists = []
         dists_final = []
         k = 0
@@ -103,6 +120,30 @@ class PushPuck:
             dists.append(np.linalg.norm(goal_pos - ball_pos))
             dists_final.append(np.linalg.norm(goal_final_pos - ball_pos))
 
+            k_actual = np.minimum(des_pos.shape[0] - 1, k)
+
+            cur_pos = self.sim.data.qpos[0:7].copy()
+            cur_vel = self.sim.data.qvel[0:7].copy()
+            actual_pos[k_actual, :] = cur_pos
+
+            # Use MuJoCo's internal PD Controller
+            gripper_ctrl = -1  # Keep gripper closed
+            self.sim.data.ctrl[:] = np.concatenate((des_pos[k_actual], des_vel[k_actual], [gripper_ctrl, gripper_ctrl]))
+
+            # Apply gravity compensation
+            self.sim.data.qfrc_applied[self.joint_indices] = self.sim.data.qfrc_bias[self.joint_indices]
+
+            # Forward the simulation
+            self.sim.step()
+
+            # Render the scene
+            if self.render and self.viewer is not None:
+                self.viewer.render()
+
+            k += 1
+
+            """
+            Old ctrl loop
             # Compute the controls
             cur_pos = self.sim.data.qpos[0:7].copy()
             cur_vel = self.sim.data.qvel[0:7].copy()
@@ -114,6 +155,9 @@ class PushPuck:
 
             # Advance the simulation
             self.sim.data.qfrc_applied[0:7] = trq
+            
+            
+            
             try:
                 self.sim.step()
             except mujoco_py.builder.MujocoException as e:
@@ -123,6 +167,7 @@ class PushPuck:
                 for i in range(k + 1, des_pos.shape[0] + 200):
                     torques.append(trq)
                 break
+            
 
             k += 1
 
@@ -132,30 +177,32 @@ class PushPuck:
             #     for i in range(k + 1, des_pos.shape[0]):
             #         torques.append(trq)
             #     break
+            
 
             if viewer is not None:
                 viewer.render()
 
         if viewer is not None:
             viewer.close()
+        """
 
         if plot_trajectory:
             plt.figure()
             plt.plot(actual_pos)
             plt.pause(0.1)
 
-            plt.figure()
-            plt.plot(np.vstack(torques))
-            plt.pause(0.1)
+            # plt.figure()
+            # plt.plot(np.vstack(torques))
+            # plt.pause(0.1)
         min_dist = np.min(dists)
         return 0
 
 
 if __name__ == '__main__':
-    pp = PushPuck(nsubsteps=5)
+    pp = PushPuck2(nsubsteps=5, render=True)
     # Only make joint 2,4 and 6 controllable!
 
     w = 50 * np.random.randn(15)
-    pp.rollout(w, render=True)
+    pp.rollout(w)
     # for i in range(10000):
     #     pp.viewer.render()
