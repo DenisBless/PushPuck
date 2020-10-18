@@ -1,11 +1,12 @@
-from pathlib import Path
-import numpy as np
 import mujoco_py
+import numpy as np
+import matplotlib.pyplot as plt
+from pathlib import Path
 from mujoco_py import MjSim, MjViewer, load_model_from_path, MjSimState
 from utils.helpers import set_puck
-from mp_lib.mp_lib.dmps import DMP
-from mp_lib.mp_lib.phase import ExpDecayPhaseGenerator
-from mp_lib.mp_lib.basis import DMPBasisGenerator
+from mp_lib.dmps import DMP
+from mp_lib.phase import ExpDecayPhaseGenerator
+from mp_lib.basis import DMPBasisGenerator
 
 
 class PushPuck:
@@ -79,7 +80,6 @@ class PushPuck:
 
         plot_trajectory = True
         if plot_trajectory:
-            import matplotlib.pyplot as plt
             plt.plot(des_pos)
             plt.pause(0.1)
 
