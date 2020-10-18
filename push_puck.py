@@ -1,9 +1,8 @@
-import mujoco_py
 import numpy as np
 import matplotlib.pyplot as plt
 from pathlib import Path
 from mujoco_py import MjSim, MjViewer, load_model_from_path, MjSimState
-from utils.helpers import set_puck
+from utils.helper import set_puck
 from mp_lib.dmps import DMP
 from mp_lib.phase import ExpDecayPhaseGenerator
 from mp_lib.basis import DMPBasisGenerator
@@ -63,7 +62,7 @@ class PushPuckBase(ABC):
         raise NotImplementedError
 
 
-class PushPuck0(PushPuckBase):
+class PushPuckNoRobot(PushPuckBase):
     def __init__(self,
                  nsubsteps: int = 1,
                  render: bool = True,
@@ -80,7 +79,7 @@ class PushPuck0(PushPuckBase):
 
     @property
     def raw_xml_path(self):
-        return str(Path(__file__).resolve().parents[0]) + '/assets/xml_model/env_model_0_raw.xml'
+        return str(Path(__file__).resolve().parents[0]) + '/assets/xml_model/env_model_no_robot_raw.xml'
 
     def rollout(self, weights):
         for i in range(10000):
@@ -96,7 +95,7 @@ class PushPuck2(PushPuckBase):
 
     @property
     def raw_xml_path(self):
-        return str(Path(__file__).resolve().parents[0]) + '/assets/xml_model/env_model_2_raw.xml'
+        return str(Path(__file__).resolve().parents[0]) + '/assets/xml_model/env_model_robot_raw.xml'
 
     @property
     def robot_init_qpos(self):
@@ -182,7 +181,7 @@ class PushPuck2(PushPuckBase):
             k += 1
 
             """
-            Old ctrl loop
+            ----------------------  Old ctrl loop ----------------------
             # Compute the controls
             cur_pos = self.sim.data.qpos[0:7].copy()
             cur_vel = self.sim.data.qvel[0:7].copy()
@@ -223,6 +222,7 @@ class PushPuck2(PushPuckBase):
 
         if viewer is not None:
             viewer.close()
+        ------------------------------------------------------------
         """
 
         if plot_trajectory:
@@ -238,7 +238,7 @@ class PushPuck2(PushPuckBase):
 
 
 if __name__ == '__main__':
-    pp = PushPuck0(nsubsteps=5, render=True)
+    pp = PushPuckNoRobot(nsubsteps=5, render=True)
     # Only make joint 2,4 and 6 controllable!
 
     w = 50 * np.random.randn(15)

@@ -29,9 +29,6 @@
             solref="0.002 1"
             type="cylinder" />
     </body>
-    <body name="panda_ground" pos="0 0 0">
-        <geom type="box" size="0.18 0.18 0.01" rgba=".9 .9 .9 1"/>
-    </body>
     <body name="table" pos="0.5 0 -0.2">
         <geom type="box" size="0.7 0.2 0.2" rgba=".9 .9 .9 1"/>
     </body>
