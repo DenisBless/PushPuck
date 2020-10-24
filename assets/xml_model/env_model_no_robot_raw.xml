@@ -34,9 +34,9 @@
     </body>
   </worldbody>
       <actuator>
-        <motor ctrllimited="true" forcelimited="true" ctrlrange="-1 1" forcerange="-87 87"
+        <motor ctrllimited="true" forcelimited="true" ctrlrange="-100 100" forcerange="-87 87"
         joint="box:x_joint" name="puck_x_motor" />
-        <motor ctrllimited="true" forcelimited="true" ctrlrange="-1 1" forcerange="-87 87"
+        <motor ctrllimited="true" forcelimited="true" ctrlrange="-100 100" forcerange="-87 87"
         joint="box:y_joint" name="puck_y_motor" />
     </actuator>
 </mujoco>

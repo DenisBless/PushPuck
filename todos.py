@@ -8,4 +8,5 @@
 • Find out a good initial position -> [0, 0.202, 0, -2.86, 0, 1.98, 0.771, 0, 0]
 • Write a .xml parser for initial puck position, puck size -> Done
 • dt? substeps? -> Use 500Hz and 5 substeps = 100 Hz control frequency
+• Add a collision check function
 """

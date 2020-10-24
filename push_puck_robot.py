@@ -34,7 +34,7 @@ class PushPuck3DoF(PushPuckRobot):
         super().__init__(nsubsteps=nsubsteps, render=render)
         self.num_dof = 3
 
-    def rollout(self, weights):
+    def rollout(self, weights, extra_timesteps=200):
         weights = np.reshape(weights, (-1, 3))
         n_steps = weights.shape[0]
 
@@ -50,8 +50,7 @@ class PushPuck3DoF(PushPuckRobot):
                   basis_generator=basis_generator,
                   phase_generator=phase_generator,
                   num_time_steps=n_time_steps,
-                  dt=dt
-                  )
+                  dt=dt)
 
         dmp.dmp_start_pos = self.robot_init_qpos[:-2].reshape((1, -1))
 
