@@ -32,5 +32,3 @@ class PushPuckNoRobot(PushPuckBase):
             self.sim.step()
             if self.render:
                 self.viewer.render()
-        # for i in range(10000):
-        #     pass

@@ -104,7 +104,8 @@ class PushPuck3DoF(PushPuckRobot):
             self.sim.data.ctrl[:] = np.concatenate((des_pos[k_actual], des_vel[k_actual], [gripper_ctrl, gripper_ctrl]))
 
             # Apply gravity compensation
-            self.sim.data.qfrc_applied[self.joint_indices] = self.sim.data.qfrc_bias[self.joint_indices]
+            joint_indices = np.arange(1, 8)
+            self.sim.data.qfrc_applied[joint_indices] = self.sim.data.qfrc_bias[joint_indices]
 
             # Forward the simulation
             self.sim.step()
@@ -134,7 +135,7 @@ class PushPuck7DoF(PushPuckRobot):
         super().__init__(nsubsteps=nsubsteps, render=render)
         self.num_dof = 7
 
-    def rollout(self, weights):
+    def rollout(self, weights, extra_timesteps=200):
         weights = np.reshape(weights, (-1, 3))
         n_steps = weights.shape[0]
 
@@ -150,8 +151,7 @@ class PushPuck7DoF(PushPuckRobot):
                   basis_generator=basis_generator,
                   phase_generator=phase_generator,
                   num_time_steps=n_time_steps,
-                  dt=dt
-                  )
+                  dt=dt)
 
         dmp.dmp_start_pos = self.robot_init_qpos[:-2].reshape((1, -1))
 
@@ -198,7 +198,8 @@ class PushPuck7DoF(PushPuckRobot):
             self.sim.data.ctrl[:] = np.concatenate((des_pos[k_actual], des_vel[k_actual], [gripper_ctrl, gripper_ctrl]))
 
             # Apply gravity compensation
-            self.sim.data.qfrc_applied[self.joint_indices] = self.sim.data.qfrc_bias[self.joint_indices]
+            joint_indices = np.arange(1, 8)
+            self.sim.data.qfrc_applied[joint_indices] = self.sim.data.qfrc_bias[joint_indices]
 
             # Forward the simulation
             self.sim.step()
@@ -264,3 +265,10 @@ class PushPuck7DoF(PushPuckRobot):
             # plt.pause(0.1)
         min_dist = np.min(dists)
         return 0
+
+if __name__ == '__main__':
+    pp = PushPuck3DoF(nsubsteps=5, render=True)
+    # Only make joint 2,4 and 6 controllable!
+
+    w = 50 * np.random.randn(15)
+    pp.rollout(w)
