@@ -9,4 +9,16 @@
 • Write a .xml parser for initial puck position, puck size -> Done
 • dt? substeps? -> Use 500Hz and 5 substeps = 100 Hz control frequency
 • Add a collision check function
+
+20.10.2020
+• PushPuckNoRobot: 2D input action, rollout apply force/impulse
+• PushPuck2:
+    • rollout input weights + goal pos
+    • collision check
+    • max episode length class attribute (200...)
+    •
+• PushPuck_v3: fully parametrized to actuate all joints
+    • Puck goal position as input for init
+
+• Parallel rollouts
 """
