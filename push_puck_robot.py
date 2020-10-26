@@ -1,4 +1,3 @@
-
 import numpy as np
 from pathlib import Path
 from push_puck_base import PushPuckBase
@@ -267,7 +266,7 @@ class PushPuck7DoF(PushPuckRobot):
         return 0
 
 if __name__ == '__main__':
-    pp = PushPuck3DoF(nsubsteps=5, render=True)
+    pp = PushPuck7DoF(nsubsteps=5, render=True)
     # Only make joint 2,4 and 6 controllable!
 
     w = 50 * np.random.randn(15)

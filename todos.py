@@ -12,3 +12,14 @@
 • Add the multiprocessing part
 • Add robot_final_qpos as a parameter to rollout()
 """
+
+"""20.10.2020
+• PushPuckNoRobot: 2D input action, rollout apply force/impulse
+• PushPuck2:
+    • rollout input weights + goal pos
+    • collision check
+    • max episode length class attribute (200...)
+• PushPuck_v3: fully parametrized to actuate all joints
+    • Puck goal position as input for init
+• Parallel rollouts"
+"""
