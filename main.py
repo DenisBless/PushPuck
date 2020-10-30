@@ -1,5 +1,4 @@
-from push_puck_no_robot import PushPuckNoRobot
-from push_puck_robot import PushPuck3DoF, PushPuck7DoF
+from push_puck.push_puck_robot import PushPuck7DoF
 import numpy as np
 
 
@@ -9,5 +8,7 @@ if __name__ == '__main__':
     # pp = PushPuckNoRobot()
 
     weights = np.random.randn(15)
-    pp = PushPuck7DoF()
-    pp.rollout(weights=weights, extra_timesteps=5000)
+    pp = PushPuck7DoF(render=False)
+    reward = pp.rollout(weights=weights, extra_timesteps=1000)
+
+    print(reward)

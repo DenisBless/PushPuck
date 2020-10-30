@@ -1,6 +1,6 @@
 import numpy as np
 from pathlib import Path
-from push_puck_base import PushPuckBase
+from push_puck.push_puck_base import PushPuckBase
 
 
 class PushPuckNoRobot(PushPuckBase):
