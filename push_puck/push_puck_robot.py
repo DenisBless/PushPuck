@@ -1,6 +1,6 @@
 import numpy as np
 from pathlib import Path
-from push_puck_base import PushPuckBase
+from push_puck.push_puck_base import PushPuckBase
 from mp_lib.dmps import DMP
 from mp_lib.phase import ExpDecayPhaseGenerator
 from mp_lib.basis import DMPBasisGenerator
@@ -166,25 +166,32 @@ class PushPuck7DoF(PushPuckRobot):
                         goal=self.robot_final_qpos[:-2])
         des_pos, des_vel = dmp.reference_trajectory(t)
 
-        plot_trajectory = True
-        if plot_trajectory:
-            plt.plot(des_pos)
-            plt.pause(0.1)
+        plot_trajectory = False
+        # if plot_trajectory:
+        #     plt.plot(des_pos)
+        #     plt.pause(0.1)
 
         dists = []
         dists_final = []
+        puck_poss = []
+        puck_vels = []
         k = 0
         torques = []
 
+        puck_id = self.sim.model._body_name2id["puck"]
+        goal_pos = np.array((1.15, 0, 0))  # self.sim.data.site_xpos[goal_id]
+
         actual_pos = np.zeros_like(des_pos)
         error = False
-        while k < des_pos.shape[0] + 200:
+        while k < des_pos.shape[0] + extra_timesteps:
             # Compute the current distance from the ball to the inner part of the cup
-            goal_pos = 0  # self.sim.data.site_xpos[goal_id]
-            ball_pos = 0  # self.sim.data.body_xpos[ball_id]
+            puck_pos = self.sim.data.body_xpos[puck_id].copy()
+            puck_vel = self.sim.data.body_xvelp[puck_id].copy()
+            puck_poss.append(puck_pos)
+            puck_vels.append(puck_vel)
             goal_final_pos = 0  # self.sim.data.site_xpos[goal_final_id]
-            dists.append(np.linalg.norm(goal_pos - ball_pos))
-            dists_final.append(np.linalg.norm(goal_final_pos - ball_pos))
+            dists.append(np.linalg.norm(goal_pos - puck_pos))
+            dists_final.append(np.linalg.norm(goal_final_pos - puck_pos))
 
             k_actual = np.minimum(des_pos.shape[0] - 1, k)
 
@@ -256,14 +263,20 @@ class PushPuck7DoF(PushPuckRobot):
 
         if plot_trajectory:
             plt.figure()
-            plt.plot(actual_pos)
+            plt.plot(puck_poss)
+            plt.pause(0.1)
+            plt.figure()
+            plt.plot(puck_vels)
+            plt.pause(0.1)
+            plt.figure()
+            plt.plot(dists)
             plt.pause(0.1)
 
             # plt.figure()
             # plt.plot(np.vstack(torques))
             # plt.pause(0.1)
         min_dist = np.min(dists)
-        return 0
+        return dists[-1]**2 + np.linalg.norm(puck_vel)
 
 if __name__ == '__main__':
     pp = PushPuck7DoF(nsubsteps=5, render=True)

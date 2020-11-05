@@ -1,8 +1,7 @@
 import numpy as np
-import matplotlib.pyplot as plt
 from pathlib import Path
 from mujoco_py import MjSim, MjViewer, load_model_from_path, MjSimState
-from utils.helper import set_puck
+from push_puck.utils.helper import set_puck
 from abc import abstractmethod, ABC
 
 
@@ -21,6 +20,10 @@ class PushPuckBase(ABC):
         # self.joint_indices = [x for x in range(1, num_dof + 1)]
 
         self.reset()
+
+    def __call__(self, weights, extra_timesteps=1000):
+        self.reset()
+        return self.rollout(weights, extra_timesteps)
 
     def reset(self):
         """Resets the environment (including the agent) to the initial conditions.

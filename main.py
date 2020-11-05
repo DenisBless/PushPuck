@@ -1,5 +1,4 @@
-from push_puck_no_robot import PushPuckNoRobot
-from push_puck_robot import PushPuck3DoF, PushPuck7DoF
+from push_puck.push_puck_robot import PushPuck7DoF
 import numpy as np
 from multiprocessing import Process
 
