@@ -33,7 +33,7 @@ class PushPuck3DoF(PushPuckRobot):
         super().__init__(nsubsteps=nsubsteps, render=render)
         self.num_dof = 3
 
-    def rollout(self, weights, extra_timesteps=200):
+    def rollout(self, weights, goal_pos, extra_timesteps=200):
         weights = np.reshape(weights, (-1, 3))
         n_steps = weights.shape[0]
 
@@ -134,7 +134,7 @@ class PushPuck7DoF(PushPuckRobot):
         super().__init__(nsubsteps=nsubsteps, render=render)
         self.num_dof = 7
 
-    def rollout(self, weights, extra_timesteps=200):
+    def rollout(self, weights, goal_pos=None, extra_timesteps=200):
         weights = np.reshape(weights, (-1, 3))
         n_steps = weights.shape[0]
 

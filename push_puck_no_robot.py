@@ -21,7 +21,7 @@ class PushPuckNoRobot(PushPuckBase):
     def raw_xml_path(self):
         return str(Path(__file__).resolve().parents[0]) + '/assets/xml_model/env_model_no_robot_raw.xml'
 
-    def rollout(self, weights, extra_timesteps=200):
+    def rollout(self, weights, goal_pos=None, extra_timesteps=200):
         self.sim.reset()
         self.sim.data.ctrl[:] = weights
         self.sim.step()

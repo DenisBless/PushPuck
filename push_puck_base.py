@@ -54,5 +54,5 @@ class PushPuckBase(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def rollout(self, weights, extra_timesteps=200):
+    def rollout(self, weights, goal_pos, extra_timesteps=200):
         raise NotImplementedError
