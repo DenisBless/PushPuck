@@ -6,6 +6,8 @@ from mp_lib.phase import ExpDecayPhaseGenerator
 from mp_lib.basis import DMPBasisGenerator
 import matplotlib.pyplot as plt
 
+from push_puck.utils.helper import set_puck, set_target
+
 
 class PushPuckRobot(PushPuckBase):
     def __init__(self,
@@ -31,9 +33,11 @@ class PushPuck3DoF(PushPuckRobot):
                  nsubsteps: int = 1,
                  render: bool = True):
         super().__init__(nsubsteps=nsubsteps, render=render)
-        self.num_dof = 3
 
-    def rollout(self, weights, goal_pos, extra_timesteps=200):
+    def rollout(self, weights, target_pos=None, extra_timesteps=200):
+        set_puck(raw_xml_path=self.raw_xml_path, xml_path=self.xml_path, puck_size=None, puck_pos=None)
+        set_target(raw_xml_path=self.raw_xml_path, xml_path=self.xml_path, target_pos=target_pos)
+
         weights = np.reshape(weights, (-1, 3))
         n_steps = weights.shape[0]
 
@@ -45,7 +49,7 @@ class PushPuck3DoF(PushPuckRobot):
         phase_generator = ExpDecayPhaseGenerator(duration=ep_len, alpha_phase=5)
         basis_generator = DMPBasisGenerator(phase_generator, num_basis=num_basis, duration=ep_len)
 
-        dmp = DMP(num_dof=self.num_dof,
+        dmp = DMP(num_dof=7,
                   basis_generator=basis_generator,
                   phase_generator=phase_generator,
                   num_time_steps=n_time_steps,
@@ -132,9 +136,9 @@ class PushPuck7DoF(PushPuckRobot):
                  nsubsteps: int = 1,
                  render: bool = True):
         super().__init__(nsubsteps=nsubsteps, render=render)
-        self.num_dof = 7
 
-    def rollout(self, weights, goal_pos=None, extra_timesteps=200):
+    def rollout(self, weights, target_pos=None, extra_timesteps=200):
+        set_target(raw_xml_path=self.raw_xml_path, xml_path=self.xml_path, target_pos=target_pos)
         weights = np.reshape(weights, (-1, 3))
         n_steps = weights.shape[0]
 
@@ -146,7 +150,7 @@ class PushPuck7DoF(PushPuckRobot):
         phase_generator = ExpDecayPhaseGenerator(duration=ep_len, alpha_phase=5)
         basis_generator = DMPBasisGenerator(phase_generator, num_basis=num_basis, duration=ep_len)
 
-        dmp = DMP(num_dof=self.num_dof,
+        dmp = DMP(num_dof=7,
                   basis_generator=basis_generator,
                   phase_generator=phase_generator,
                   num_time_steps=n_time_steps,
@@ -154,13 +158,13 @@ class PushPuck7DoF(PushPuckRobot):
 
         dmp.dmp_start_pos = self.robot_init_qpos[:-2].reshape((1, -1))
 
-        weights = np.concatenate((np.zeros((n_steps, 1)),
-                                  weights[:, 0][:, None],
-                                  np.zeros((n_steps, 1)),
-                                  weights[:, 1][:, None],
-                                  np.zeros((n_steps, 1)),
+        weights = np.concatenate((weights[:, 1][:, None],
                                   weights[:, 2][:, None],
-                                  np.zeros((n_steps, 1))), axis=1)
+                                  weights[:, 3][:, None],
+                                  weights[:, 4][:, None],
+                                  weights[:, 5][:, None],
+                                  weights[:, 6][:, None],
+                                  weights[:, 7][:, None],), axis=1)
         weights = np.concatenate((np.zeros((2, 7)), weights, np.zeros((2, 7))), axis=0)
         dmp.set_weights(weights,
                         goal=self.robot_final_qpos[:-2])
@@ -215,51 +219,6 @@ class PushPuck7DoF(PushPuckRobot):
                 self.viewer.render()
 
             k += 1
-
-            """
-            ----------------------  Old ctrl loop ----------------------
-            # Compute the controls
-            cur_pos = self.sim.data.qpos[0:7].copy()
-            cur_vel = self.sim.data.qvel[0:7].copy()
-            k_actual = np.minimum(des_pos.shape[0] - 1, k)
-            trq = self.p_gains * (des_pos[k_actual, :] - cur_pos) + self.d_gains * (des_vel[k_actual, :] - cur_vel)
-            torques.append(trq)
-
-            actual_pos[k_actual, :] = cur_pos
-
-            # Advance the simulation
-            self.sim.data.qfrc_applied[0:7] = trq
-
-
-
-            try:
-                self.sim.step()
-            except mujoco_py.builder.MujocoException as e:
-                print("Error in simulation: " + str(e))
-                error = True
-                # Copy the current torque as if it would have been applied until the end of the trajectory
-                for i in range(k + 1, des_pos.shape[0] + 200):
-                    torques.append(trq)
-                break
-
-
-            k += 1
-
-            # # Check for a collision - in which case we end the simulation
-            # if BallInACupCostFunction._check_collision(self.sim, ball_collision_id, collision_ids):
-            #     # Copy the current torque as if it would have been applied until the end of the trajectory
-            #     for i in range(k + 1, des_pos.shape[0]):
-            #         torques.append(trq)
-            #     break
-
-
-            if viewer is not None:
-                viewer.render()
-
-        if viewer is not None:
-            viewer.close()
-        ------------------------------------------------------------
-        """
 
         if plot_trajectory:
             plt.figure()

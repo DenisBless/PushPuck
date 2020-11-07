@@ -1,6 +1,7 @@
 import numpy as np
 from pathlib import Path
 from push_puck.push_puck_base import PushPuckBase
+from push_puck.utils.helper import set_puck, set_target
 
 
 class PushPuckNoRobot(PushPuckBase):
@@ -21,7 +22,8 @@ class PushPuckNoRobot(PushPuckBase):
     def raw_xml_path(self):
         return str(Path(__file__).resolve().parents[0]) + '/assets/xml_model/env_model_no_robot_raw.xml'
 
-    def rollout(self, weights, goal_pos=None, extra_timesteps=200):
+    def rollout(self, weights, target_pos=None, extra_timesteps=200):
+        set_target(raw_xml_path=self.raw_xml_path, xml_path=self.xml_path, target_pos=target_pos)
         self.sim.reset()
         self.sim.data.ctrl[:] = weights
         self.sim.step()

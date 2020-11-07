@@ -25,7 +25,11 @@
 """
 
 """5.11.2020
-• Goal pos parsing
-• Multiprocessing
-• 1 Class with call function which takes weight batch and returns Rewards from all samples
+• Goal pos parsing (Needs to be in code since the xml is loaded at the beginning)
+• Multiprocessing -> Done
+• 1 Class with call function which takes weight batch and returns Rewards from all samples -> Done
+"""
+
+"""Questions
+-Where should we specify the puck_pos/size? Is it different for trajectories or put it in __init()__? 
 """

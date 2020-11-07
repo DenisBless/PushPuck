@@ -17,8 +17,6 @@ class PushPuckBase(ABC):
         self.sim = MjSim(model=model, nsubsteps=nsubsteps)
         self.viewer = MjViewer(self.sim) if render else None
 
-        # self.joint_indices = [x for x in range(1, num_dof + 1)]
-
         self.reset()
 
     def __call__(self, weights, extra_timesteps=1000):
