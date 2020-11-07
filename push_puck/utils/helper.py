@@ -16,6 +16,15 @@ def set_puck(raw_xml_path, xml_path, puck_size=None, puck_pos=None):
             f1.write(raw_xml)
 
 
+def set_target(raw_xml_path, xml_path, target_pos=None):
+    target_pos = [1.2, 0, 0] if target_pos is None else target_pos
+    with open(raw_xml_path, "r") as f:
+        raw_xml = f.read()
+        raw_xml = raw_xml.replace("[target_pos]", ' '.join(map(str, target_pos)))
+        with open(xml_path, "w") as f1:
+            f1.write(raw_xml)
+
+
 def has_collision(obj1_name, obj2_name, sim):
     obj1 = sim.model.geom_name2id(obj1_name)
     obj2 = sim.model.geom_name2id(obj2_name)

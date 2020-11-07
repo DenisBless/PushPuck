@@ -32,6 +32,7 @@
     <body name="table" pos="0.5 0 -0.2">
         <geom type="box" size="0.7 0.2 0.2" rgba=".9 .9 .9 1"/>
     </body>
+    <site name="target0" pos="[target_pos]" size="0.02 0.02 0.02" rgba="1 0 0 1" type="sphere"/>
   </worldbody>
       <actuator>
         <motor ctrllimited="true" forcelimited="true" ctrlrange="-100 100" forcerange="-87 87"

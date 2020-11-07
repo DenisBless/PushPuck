@@ -12,7 +12,9 @@ if __name__ == '__main__':
     N_WORKERS = 6
 
     weights, goal_pos = ...  # StochasticSearchByMax()
-
+    # dim(weights) = num_samples x size_weight_vector
+    # dim(goal_pos) = num_samples x num_dof ?
+    # rollout returns reward
     processes = [Process(target=worker, args=(weights, goal_pos, pid))
           for (weights, goal_pos, pid) in zip(weights, goal_pos, range(0, N_WORKERS))]
 

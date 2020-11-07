@@ -23,3 +23,9 @@
     • Puck goal position as input for init
 • Parallel rollouts"
 """
+
+"""5.11.2020
+• Goal pos parsing
+• Multiprocessing
+• 1 Class with call function which takes weight batch and returns Rewards from all samples
+"""
