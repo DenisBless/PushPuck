@@ -20,7 +20,7 @@ if __name__ == '__main__':
         pp = PushPuck7DoF(render=True)
 
     else:
-        raise ValueError("Invalid DoF")
+        raise ValueError("Invalid DoF.")
 
     reward = pp.rollout(weights=weights, extra_timesteps=1000)
     print("Reward: ", reward)

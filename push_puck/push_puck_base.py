@@ -40,13 +40,40 @@ class PushPuckBase(ABC):
         return str(Path(__file__).resolve().parents[0]) + '/' + 'assets/xml_model/env_model.xml'
 
     def set_target(self, target_pos) -> None:
+        """
+        Sets the postion of the target.
+        :param target_pos: Desired target position
+        """
         if target_pos is None:
             target_pos = [0.7, 0, 0.02]
 
         body_id = self.sim.model.body_name2id('target')
         self.sim.model.body_pos[body_id] = target_pos
-
         self.sim.forward()
+
+    @property
+    def target_pos(self):
+        """
+        Helper for getting the current target position.
+        :return: Current target position
+        """
+        return self.sim.data.get_site_xpos('target:site1').copy()
+
+    @property
+    def puck_pos(self):
+        """
+        Helper for getting the current puck position.
+        :return: Current puck position
+        """
+        return self.sim.data.get_body_xpos('puck').copy()
+
+    @property
+    def tcp_pos(self):
+        """
+        Helper for getting the current end effector position.
+        :return: Current end effector position
+        """
+        return self.sim.data.get_body_xpos('tcp').copy()
 
     @property
     @abstractmethod
