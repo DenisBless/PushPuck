@@ -34,7 +34,6 @@ class PushPuck3DoF(PushPuckRobot):
 
     def rollout(self, weights, target_pos=None, extra_timesteps=200):
         self.set_target(target_pos=target_pos)
-        print(weights)
         weights = np.reshape(weights, (-1, 3))
         n_steps = weights.shape[0]
 
