@@ -7,14 +7,14 @@ from abc import abstractmethod, ABC
 
 class PushPuckBase(ABC):
     def __init__(self,
-                 nsubsteps: int = 1,
-                 render: bool = True):
+                 n_substeps: int = 1,
+                 render: bool = False):
         self.render = render
 
         set_puck(raw_xml_path=self.raw_xml_path, xml_path=self.xml_path, puck_size=None, puck_pos=None)
         model = load_model_from_path(self.xml_path)
 
-        self.sim = MjSim(model=model, nsubsteps=nsubsteps)
+        self.sim = MjSim(model=model, nsubsteps=n_substeps)
         self.viewer = MjViewer(self.sim) if render else None
 
         self.reset()
@@ -23,7 +23,7 @@ class PushPuckBase(ABC):
         self.reset()
         return self.rollout(weights, extra_timesteps)
 
-    def reset(self):
+    def reset(self) -> None:
         """Resets the environment (including the agent) to the initial conditions.
         """
         self.sim.reset()
@@ -36,8 +36,17 @@ class PushPuckBase(ABC):
         self.sim.forward()
 
     @property
-    def xml_path(self):
+    def xml_path(self) -> str:
         return str(Path(__file__).resolve().parents[0]) + '/' + 'assets/xml_model/env_model.xml'
+
+    def set_target(self, target_pos) -> None:
+        if target_pos is None:
+            target_pos = [0.7, 0, 0.02]
+
+        body_id = self.sim.model.body_name2id('target')
+        self.sim.model.body_pos[body_id] = target_pos
+
+        self.sim.forward()
 
     @property
     @abstractmethod

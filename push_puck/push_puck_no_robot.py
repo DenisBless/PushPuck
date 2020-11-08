@@ -1,14 +1,13 @@
 import numpy as np
 from pathlib import Path
 from push_puck.push_puck_base import PushPuckBase
-from push_puck.utils.helper import set_puck, set_target
 
 
 class PushPuckNoRobot(PushPuckBase):
     def __init__(self,
-                 nsubsteps: int = 1,
-                 render: bool = True):
-        super().__init__(nsubsteps=nsubsteps, render=render)
+                 n_substeps: int = 1,
+                 render: bool = False):
+        super().__init__(n_substeps=n_substeps, render=render)
 
     @property
     def robot_init_qpos(self):
@@ -23,8 +22,9 @@ class PushPuckNoRobot(PushPuckBase):
         return str(Path(__file__).resolve().parents[0]) + '/assets/xml_model/env_model_no_robot_raw.xml'
 
     def rollout(self, weights, target_pos=None, extra_timesteps=200):
-        set_target(raw_xml_path=self.raw_xml_path, xml_path=self.xml_path, target_pos=target_pos)
         self.sim.reset()
+        self.set_target(target_pos=target_pos)
+
         self.sim.data.ctrl[:] = weights
         self.sim.step()
         if self.render:
@@ -34,3 +34,5 @@ class PushPuckNoRobot(PushPuckBase):
             self.sim.step()
             if self.render:
                 self.viewer.render()
+
+        return np.linalg.norm(self.sim.data.get_body_xpos('puck') - self.sim.data.get_site_xpos('target:site1'))

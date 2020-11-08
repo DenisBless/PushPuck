@@ -32,4 +32,8 @@
 
 """Questions
 -Where should we specify the puck_pos/size? Is it different for trajectories or put it in __init()__? 
+-What if target pos is None?
+"""
+
+"""Notes
 """

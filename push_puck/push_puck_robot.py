@@ -6,14 +6,12 @@ from mp_lib.phase import ExpDecayPhaseGenerator
 from mp_lib.basis import DMPBasisGenerator
 import matplotlib.pyplot as plt
 
-from push_puck.utils.helper import set_puck, set_target
-
 
 class PushPuckRobot(PushPuckBase):
     def __init__(self,
-                 nsubsteps: int = 1,
+                 n_substeps: int = 1,
                  render: bool = True):
-        super().__init__(nsubsteps=nsubsteps, render=render)
+        super().__init__(n_substeps=n_substeps, render=render)
 
     @property
     def raw_xml_path(self):
@@ -30,13 +28,12 @@ class PushPuckRobot(PushPuckBase):
 
 class PushPuck3DoF(PushPuckRobot):
     def __init__(self,
-                 nsubsteps: int = 1,
+                 n_substeps: int = 1,
                  render: bool = True):
-        super().__init__(nsubsteps=nsubsteps, render=render)
+        super().__init__(n_substeps=n_substeps, render=render)
 
     def rollout(self, weights, target_pos=None, extra_timesteps=200):
-        set_puck(raw_xml_path=self.raw_xml_path, xml_path=self.xml_path, puck_size=None, puck_pos=None)
-        set_target(raw_xml_path=self.raw_xml_path, xml_path=self.xml_path, target_pos=target_pos)
+        self.set_target(target_pos=target_pos)
 
         weights = np.reshape(weights, (-1, 3))
         n_steps = weights.shape[0]
@@ -91,14 +88,8 @@ class PushPuck3DoF(PushPuckRobot):
 
             k_actual = np.minimum(des_pos.shape[0] - 1, k)
 
-            cur_pos = np.array([self.sim.data.qpos[1].copy(),
-                                self.sim.data.qpos[3].copy(),
-                                self.sim.data.qpos[5].copy()])
-
-            cur_vel = np.array([self.sim.data.qvel[1].copy(),
-                                self.sim.data.qvel[3].copy(),
-                                self.sim.data.qvel[5].copy()])
-
+            cur_pos = self.sim.data.qpos[:7].copy()
+            cur_vel = self.sim.data.qvel[:7].copy()
             actual_pos[k_actual, :] = cur_pos
 
             # Use MuJoCo's internal PD Controller
@@ -133,13 +124,13 @@ class PushPuck3DoF(PushPuckRobot):
 
 class PushPuck7DoF(PushPuckRobot):
     def __init__(self,
-                 nsubsteps: int = 1,
+                 n_substeps: int = 1,
                  render: bool = True):
-        super().__init__(nsubsteps=nsubsteps, render=render)
+        super().__init__(n_substeps=n_substeps, render=render)
 
     def rollout(self, weights, target_pos=None, extra_timesteps=200):
-        set_target(raw_xml_path=self.raw_xml_path, xml_path=self.xml_path, target_pos=target_pos)
-        weights = np.reshape(weights, (-1, 3))
+        self.set_target(target_pos=target_pos)
+        weights = np.reshape(weights, (-1, 7))
         n_steps = weights.shape[0]
 
         dt = self.sim.model.opt.timestep * self.sim.nsubsteps
@@ -158,13 +149,14 @@ class PushPuck7DoF(PushPuckRobot):
 
         dmp.dmp_start_pos = self.robot_init_qpos[:-2].reshape((1, -1))
 
-        weights = np.concatenate((weights[:, 1][:, None],
+        weights = np.concatenate((weights[:, 0][:, None],
+                                  weights[:, 1][:, None],
                                   weights[:, 2][:, None],
                                   weights[:, 3][:, None],
                                   weights[:, 4][:, None],
                                   weights[:, 5][:, None],
-                                  weights[:, 6][:, None],
-                                  weights[:, 7][:, None],), axis=1)
+                                  weights[:, 6][:, None]
+                                  ), axis=1)
         weights = np.concatenate((np.zeros((2, 7)), weights, np.zeros((2, 7))), axis=0)
         dmp.set_weights(weights,
                         goal=self.robot_final_qpos[:-2])
@@ -238,7 +230,7 @@ class PushPuck7DoF(PushPuckRobot):
         return dists[-1]**2 + np.linalg.norm(puck_vel)
 
 if __name__ == '__main__':
-    pp = PushPuck7DoF(nsubsteps=5, render=True)
+    pp = PushPuck7DoF(n_substeps=5, render=True)
     # Only make joint 2,4 and 6 controllable!
 
     w = 50 * np.random.randn(15)
