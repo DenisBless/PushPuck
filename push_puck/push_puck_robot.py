@@ -227,10 +227,3 @@ class PushPuck7DoF(PushPuckRobot):
             # plt.pause(0.1)
         min_dist = np.min(dists)
         return dists[-1]**2 + np.linalg.norm(puck_vel)
-
-if __name__ == '__main__':
-    pp = PushPuck7DoF(n_substeps=5, render=True)
-    # Only make joint 2,4 and 6 controllable!
-
-    w = 50 * np.random.randn(15)
-    pp.rollout(w)

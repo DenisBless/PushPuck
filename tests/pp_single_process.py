@@ -3,7 +3,7 @@ from push_puck.push_puck_no_robot import PushPuckNoRobot
 import numpy as np
 
 if __name__ == '__main__':
-    DoF = 3
+    DoF = 2
 
     if DoF == 2:
         weights = np.random.randn(DoF)

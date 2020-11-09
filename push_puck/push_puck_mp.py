@@ -41,9 +41,3 @@ class PushPuckMultiProcessing:
             p.join()
 
         return np.array(rewards)
-
-
-if __name__ == '__main__':
-    pp_mp = PushPuckMultiProcessing(push_puck=PushPuckNoRobot, n_workers=6, render=False)
-    rewards = pp_mp(weights=np.random.randn(32, 2), goal_pos=np.zeros([32, 1]))
-    print(rewards)

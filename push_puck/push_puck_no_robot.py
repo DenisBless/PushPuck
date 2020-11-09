@@ -35,4 +35,4 @@ class PushPuckNoRobot(PushPuckBase):
             if self.render:
                 self.viewer.render()
 
-        return np.linalg.norm(self.sim.data.get_body_xpos('puck') - self.sim.data.get_site_xpos('target:site1'))
+        return np.linalg.norm(self.puck_pos - self.target_pos)
